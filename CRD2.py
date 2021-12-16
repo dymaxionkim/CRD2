@@ -2,6 +2,7 @@ import os
 import PySimpleGUI as sg
 import numpy as np
 import matplotlib.pyplot as plt
+import ezdxf
 
 ##############################
 # Function
@@ -37,6 +38,37 @@ def Circle(DIA,SEG_CIRCLE):
     YY = DIA/2*np.cos(THETA0)
     return XX,YY
 
+def SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,khE,khR,R1,R2,X_e):
+    doc = ezdxf.new('R2000')
+    msp = doc.modelspace()
+    # Tooth of Eccentric Disc
+    Xdxf0E,YdxfE = Rotation(XhE,YhE,2*np.pi/khE,1)
+    Xdxf1E,Ydxf1E = Transform(Xdxf0E,YdxfE,X_0+X_e,Y_0)
+    Xdxf2E,Ydxf2E = Transform(XeE,YeE,X_0+X_e,Y_0)
+    cpoint1E = [(Xdxf1E[0],Ydxf1E[0])]
+    cpoint2E = [(Xdxf2E[0],Ydxf2E[0])]
+    for i in range(0,len(Xdxf1E)) :
+        cpoint1E.append((Xdxf1E[i],Ydxf1E[i]))
+        cpoint2E.append((Xdxf2E[i],Ydxf2E[i]))
+    msp.add_spline(cpoint1E)
+    msp.add_spline(cpoint2E)
+    # Tooth of Ring Gear
+    Xdxf0R,Ydxf0R = Rotation(XhR,YhR,2*np.pi/khR,1)
+    Xdxf1R,Ydxf1R = Transform(Xdxf0R,Ydxf0R,X_0,Y_0)
+    Xdxf2R,Ydxf2R = Transform(XeR,YeR,X_0,Y_0)
+    cpoint1R = [(Xdxf1R[0],Ydxf1R[0])]
+    cpoint2R = [(Xdxf2R[0],Ydxf2R[0])]
+    for i in range(0,len(Xdxf1R)) :
+        cpoint1R.append((Xdxf1R[i],Ydxf1R[i]))
+        cpoint2R.append((Xdxf2R[i],Ydxf2R[i]))
+    msp.add_spline(cpoint1R)
+    msp.add_spline(cpoint2R)
+    # Pitch Circles
+    msp.add_circle((X_0+X_e,Y_0),radius=R2)
+    msp.add_circle((X_0,Y_0),radius=R1)
+    # Output
+    doc.saveas('Result.dxf')
+
 def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
     fig = plt.figure(figsize=(13,13))
     plt.axes().set_aspect('equal')
@@ -58,33 +90,33 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
 
     ###################
     # Eccentric Disc
-    Xh,Yh,rh,kh = Hypocycloid(R2,Z2,Resolution2)
+    XhE,YhE,rhE,khE = Hypocycloid(R2,Z2,Resolution2)
     for i in range(0,int(2*Z2)):
         if(i%2!=0): # Case in Odd Number
-            Xh1,Yh1 = Rotation(Xh,Yh,2*np.pi/kh,i)
+            Xh1,Yh1 = Rotation(XhE,YhE,2*np.pi/khE,i)
             Xh2,Yh2 = Transform(Xh1,Yh1,X_0+X_e,Y_0)
             plt.plot(Xh2,Yh2,'-',linewidth=1.5,color='blue',label='_nolegend_')
 
-    Xe,Ye,re,ke = Epycycloid(R2,Z2,Resolution1)
+    XeE,YeE,reE,keE = Epycycloid(R2,Z2,Resolution1)
     for i in range(0,int(2*Z2)):
         if(i%2==0): # Case in Even Number
-            Xe1,Ye1 = Rotation(Xe,Ye,2*np.pi/kh,i)
+            Xe1,Ye1 = Rotation(XeE,YeE,2*np.pi/keE,i)
             Xe2,Ye2 = Transform(Xe1,Ye1,X_0+X_e,Y_0)
             plt.plot(Xe2,Ye2,'-',linewidth=1.5,color='blue',label='_nolegend_')
 
     ###################
     # Ring Gear
-    Xh,Yh,rh,kh = Hypocycloid(R1,Z1,Resolution1)
+    XhR,YhR,rhR,khR = Hypocycloid(R1,Z1,Resolution1)
     for i in range(0,int(2*Z1)):
         if(i%2!=0): # Case in Odd Number
-            Xh1,Yh1 = Rotation(Xh,Yh,2*np.pi/kh,i)
+            Xh1,Yh1 = Rotation(XhR,YhR,2*np.pi/khR,i)
             Xh2,Yh2 = Transform(Xh1,Yh1,X_0,Y_0)
             plt.plot(Xh2,Yh2,'-',linewidth=1.5,color='black',label='_nolegend_')
 
-    Xe,Ye,re,ke = Epycycloid(R1,Z1,Resolution2)
+    XeR,YeR,reR,keR = Epycycloid(R1,Z1,Resolution2)
     for i in range(0,int(2*Z1)):
         if(i%2==0): # Case in Even Number
-            Xe1,Ye1 = Rotation(Xe,Ye,2*np.pi/kh,i)
+            Xe1,Ye1 = Rotation(XeR,YeR,2*np.pi/keR,i)
             Xe2,Ye2 = Transform(Xe1,Ye1,X_0,Y_0)
             plt.plot(Xe2,Ye2,'-',linewidth=1.5,color='black',label='_nolegend_')
 
@@ -156,7 +188,10 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
     plt.text(X_0,Y_0+Nrow/2-Cheight*10, 'Bearing Dia=%s[mm]'%(bearing_dia),
         verticalalignment='center', horizontalalignment='center', color='blue', fontsize="large")
 
+    SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,khE,khR,R1,R2,X_e)
+
     plt.show()
+
 
 ##############################
 # GUI
