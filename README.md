@@ -32,7 +32,7 @@ python CRD2.py
 
 ![](./img/Screenshot_Pydroid3_01.jpg)
 
-![](./img/Screenshot_Android_02.jpg)
+![](./img/Screenshot_Pydroid3_02.jpg)
 
 
 ## Input parameters
