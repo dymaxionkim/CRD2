@@ -30,8 +30,6 @@ python CRD2.py
 * Clone this repository
 * Load CRD2.py and run
 
-![](./img/Screenshot_Pydroid3_01.jpg)
-
 ![](./img/Screenshot_Pydroid3_02.jpg)
 
 
