@@ -32,6 +32,14 @@ python CRD2.py
 
 ![](./img/Screenshot_Pydroid3_02.jpg)
 
+* Save plotting image like that path :
+
+```
+/storage/emulated/0/Pictures/DCIM/Screenshots/Figure_1.png
+```
+
+![](./img/Figure_1.png)
+
 
 ## Input parameters
 
