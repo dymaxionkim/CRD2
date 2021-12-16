@@ -152,7 +152,7 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0):
 sg.theme('Default')
 col = [[sg.Text('Module, M =',size = (32,1)),sg.Input(1.0,key='-M-',size = (10,1)),sg.Text('[mm], (>0)')],
        [sg.Text('Teeth Number of Ring, Z1 =',size = (32,1)),sg.Input(40,key='-Z1-',size = (10,1)),sg.Text('[ea], (>30)')],
-       [sg.Text('Teeth Difference between Ring and Disc, Ze =',size = (32,1)),sg.Input(2,key='-Ze-',size = (10,1)),sg.Text('[ea]')],
+       [sg.Text('Diff. of Ring and Disc, Ze =',size = (32,1)),sg.Input(2,key='-Ze-',size = (10,1)),sg.Text('[ea]')],
        [sg.Text('Number of Pins, pins =',size = (32,1)),sg.Input(6,key='-pins-',size = (10,1)),sg.Text('[ea]')],
        [sg.Text('Center Position, X_0 =',size = (32,1)),sg.Input(0.0,key='-X_0-',size = (10,1)),sg.Text('[mm]')],
        [sg.Text('Center Position, Y_0 =',size = (32,1)),sg.Input(0.0,key='-Y_0-',size = (10,1)),sg.Text('[mm]')],
