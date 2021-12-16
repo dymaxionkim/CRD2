@@ -37,7 +37,7 @@ def Circle(DIA,SEG_CIRCLE):
     YY = DIA/2*np.cos(THETA0)
     return XX,YY
 
-def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0):
+def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
     fig = plt.figure(figsize=(13,13))
     plt.axes().set_aspect('equal')
     plt.title('Cycloidal Eccentric Reducer Designer 2')
@@ -50,8 +50,9 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0):
     Resolution2 = 20
     X_e = -(R2-R1)
     seg_circle = 360
-    bearing_dia = 2*R2*0.6
-    pin_dia = (bearing_dia/2-R2)*0.4
+    bearing_dia = 2*R2*BEARING_FACTOR
+    pin_hole_dia = (R2-bearing_dia/2)*PIN_HOLE_FACTOR
+    pin_dia = pin_hole_dia-2*X_e
     angle_pins = 2*np.pi/pins
     I=Z2-Z1/Z2
 
@@ -109,7 +110,6 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0):
     plt.plot(XX,YY, '-', linewidth=1.5, color='black')
 
     # Pin holes on Eccentric Disc
-    pin_hole_dia = pin_dia-2*X_e
     X_pin = (R2+bearing_dia/2)/2
     Y_pin = 0.0
     for i in range(0,pins):
@@ -131,7 +131,7 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0):
         
     # Annotate
     Cheight = 2*R1/40
-    Nrow = 6*Cheight
+    Nrow = 11*Cheight
     plt.text(X_0,Y_0+Nrow/2-Cheight*0, 'Z1=%s[ea]'%(Z1),
         verticalalignment='center', horizontalalignment='center', color='black', fontsize="large")
     plt.text(X_0,Y_0+Nrow/2-Cheight*1, 'Z2=%s[ea]'%(Z2),
@@ -140,22 +140,35 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0):
         verticalalignment='center', horizontalalignment='center', color='black', fontsize="large")
     plt.text(X_0,Y_0+Nrow/2-Cheight*3, 'Pitch Dia2=%s[mm]'%(2*R2),
         verticalalignment='center', horizontalalignment='center', color='blue', fontsize="large")
-    plt.text(X_0,Y_0+Nrow/2-Cheight*4, 'Reduction Ratio=%s'%(I),
+    plt.text(X_0,Y_0+Nrow/2-Cheight*4, 'Tooth Circle Dia1=%s[mm]'%(2*R1/(2*Z1)),
+        verticalalignment='center', horizontalalignment='center', color='black', fontsize="large")
+    plt.text(X_0,Y_0+Nrow/2-Cheight*5, 'Tooth Circle Dia2=%s[mm]'%(2*R2/(2*Z2)),
+        verticalalignment='center', horizontalalignment='center', color='blue', fontsize="large")
+        
+    plt.text(X_0,Y_0+Nrow/2-Cheight*6, 'Reduction Ratio=%s'%(I),
         verticalalignment='center', horizontalalignment='center', color='red', fontsize="large")
-    plt.text(X_0,Y_0+Nrow/2-Cheight*5, 'Eccentric Distance=%s[mm]'%(2*X_e),
+    plt.text(X_0,Y_0+Nrow/2-Cheight*7, 'Eccentric Distance=%s[mm]'%(2*X_e),
         verticalalignment='center', horizontalalignment='center', color='green', fontsize="large")
+    plt.text(X_0,Y_0+Nrow/2-Cheight*8, 'Pin Dia=%s[mm]'%(pin_dia),
+        verticalalignment='center', horizontalalignment='center', color='orange', fontsize="large")
+    plt.text(X_0,Y_0+Nrow/2-Cheight*9, 'Pin Hole Dia=%s[mm]'%(pin_hole_dia),
+        verticalalignment='center', horizontalalignment='center', color='blue', fontsize="large")
+    plt.text(X_0,Y_0+Nrow/2-Cheight*10, 'Bearing Dia=%s[mm]'%(bearing_dia),
+        verticalalignment='center', horizontalalignment='center', color='blue', fontsize="large")
 
     plt.show()
 
 ##############################
 # GUI
 sg.theme('Default')
-col = [[sg.Text('Module, M =',size = (32,1)),sg.Input(1.0,key='-M-',size = (10,1)),sg.Text('[mm], (>0)')],
-       [sg.Text('Teeth Number of Ring, Z1 =',size = (32,1)),sg.Input(40,key='-Z1-',size = (10,1)),sg.Text('[ea], (>30)')],
+col = [[sg.Text('Module, M =',size = (32,1)),sg.Input(0.747865,key='-M-',size = (10,1)),sg.Text('[mm], (>0)')],
+       [sg.Text('Teeth Number of Ring, Z1 =',size = (32,1)),sg.Input(80,key='-Z1-',size = (10,1)),sg.Text('[ea], (>30)')],
        [sg.Text('Diff. of Ring and Disc, Ze =',size = (32,1)),sg.Input(2,key='-Ze-',size = (10,1)),sg.Text('[ea]')],
-       [sg.Text('Number of Pins, pins =',size = (32,1)),sg.Input(6,key='-pins-',size = (10,1)),sg.Text('[ea]')],
+       [sg.Text('Number of Pins, pins =',size = (32,1)),sg.Input(16,key='-pins-',size = (10,1)),sg.Text('[ea]')],
        [sg.Text('Center Position, X_0 =',size = (32,1)),sg.Input(0.0,key='-X_0-',size = (10,1)),sg.Text('[mm]')],
        [sg.Text('Center Position, Y_0 =',size = (32,1)),sg.Input(0.0,key='-Y_0-',size = (10,1)),sg.Text('[mm]')],
+       [sg.Text('Bearing Size Factor =',size = (32,1)),sg.Input(0.6,key='-BEARING_FACTOR-',size = (10,1)),sg.Text('(0~1)')],
+       [sg.Text('Pin Hole Size Factor =',size = (32,1)),sg.Input(0.6,key='-PIN_HOLE_FACTOR-',size = (10,1)),sg.Text('(0~1)')],
        [sg.Button('Run'), sg.Button('Exit')]]
 
 layout = [[col]]
@@ -171,13 +184,15 @@ while True:
         pins = int(values['-pins-'])
         X_0 = float(values['-X_0-'])
         Y_0 = float(values['-Y_0-'])
+        BEARING_FACTOR = float(values['-BEARING_FACTOR-'])
+        PIN_HOLE_FACTOR = float(values['-PIN_HOLE_FACTOR-'])
     except:
         sg.popup('Type error.')
 
     if event in (sg.WIN_CLOSED, 'Exit'):
         break
     elif event == 'Run':
-        CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0)
+        CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR)
 
 window.close()
 
