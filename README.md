@@ -42,7 +42,7 @@ python CRD2.py
 
 * Check dxf file :
 
-![](dxf.jpg)
+![](./img/dxf.jpg)
 
 ## Input parameters
 
