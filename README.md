@@ -38,8 +38,11 @@ python CRD2.py
 /storage/emulated/0/Pictures/DCIM/Screenshots/Figure_1.png
 ```
 
-![](./img/Figure_1.png)
+![](./img/Result.png)
 
+* Check dxf file :
+
+![](dxf.jpg)
 
 ## Input parameters
 
