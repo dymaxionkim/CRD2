@@ -38,7 +38,18 @@ def Circle(DIA,SEG_CIRCLE):
     YY = DIA/2*np.cos(THETA0)
     return XX,YY
 
-def SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,khE,khR,R1,R2,X_e):
+    ## Color
+    # 0 : white
+    # 1 : red
+    # 2 : yellow
+    # 3 : green
+    # 4 : cyan
+    # 5 : blue
+    # 6 : violet
+    # 7 : white
+    # 8 : gray
+    # 9 : white
+def SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,khE,khR,R1,R2,bearing_dia,input_dia,X_e,X_pin,Y_pin,pin_hole_dia,pin_dia,angle_pins,pins):
     doc = ezdxf.new('R2000')
     msp = doc.modelspace()
     # Tooth of Eccentric Disc
@@ -50,8 +61,8 @@ def SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,khE,khR,R1,R2,X_e):
     for i in range(0,len(Xdxf1E)) :
         cpoint1E.append((Xdxf1E[i],Ydxf1E[i]))
         cpoint2E.append((Xdxf2E[i],Ydxf2E[i]))
-    msp.add_spline(cpoint1E)
-    msp.add_spline(cpoint2E)
+    msp.add_spline(cpoint1E,dxfattribs={'color':4})
+    msp.add_spline(cpoint2E,dxfattribs={'color':4})
     # Tooth of Ring Gear
     Xdxf0R,Ydxf0R = Rotation(XhR,YhR,2*np.pi/khR,1)
     Xdxf1R,Ydxf1R = Transform(Xdxf0R,Ydxf0R,X_0,Y_0)
@@ -64,8 +75,20 @@ def SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,khE,khR,R1,R2,X_e):
     msp.add_spline(cpoint1R)
     msp.add_spline(cpoint2R)
     # Pitch Circles
-    msp.add_circle((X_0+X_e,Y_0),radius=R2)
-    msp.add_circle((X_0,Y_0),radius=R1)
+    msp.add_circle((X_0+X_e,Y_0),radius=R2,dxfattribs={'color':4,'linetype':'DASHED'})
+    msp.add_circle((X_0,Y_0),radius=R1,dxfattribs={'color':0,'linetype':'DASHED'})
+    # Bearing Circles
+    msp.add_circle((X_0+X_e,Y_0),radius=bearing_dia/2,dxfattribs={'color':4})
+    msp.add_circle((X_0,Y_0),radius=input_dia/2)
+    # Pins
+    X_pinhole_cen1 = X_0+X_pin+X_e
+    Y_pinhole_cen1 = Y_0+Y_pin
+    X_pinhole_cen2,Y_pinhole_cen2 = Transform(X_pinhole_cen1,Y_pinhole_cen1,-X_0-X_e,-Y_0)
+    for i in range(0,pins):
+        msp.add_circle((X_0+X_pin,Y_0+Y_pin),radius=pin_dia/2,dxfattribs={'color':5})
+        X_pinhole_cen3,Y_pinhole_cen3 = Rotation(X_pinhole_cen2,Y_pinhole_cen2,angle_pins,i)
+        X_pinhole_cen4,Y_pinhole_cen4 = Transform(X_pinhole_cen3,Y_pinhole_cen3,X_0+X_e,Y_0)
+        msp.add_circle((X_pinhole_cen4,Y_pinhole_cen4),radius=pin_hole_dia/2,dxfattribs={'color':4})
     # Output
     doc.saveas('Result.dxf')
 
@@ -152,8 +175,6 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
         plt.plot(XX2,YY2, '-', linewidth=1.5, color='blue')
 
     # Pin on Output Shaft
-    X_pin = (R2+bearing_dia/2)/2
-    Y_pin = 0.0
     for i in range(0,pins):
         XX,YY = Circle(pin_dia,seg_circle)
         XX,YY = Transform(XX,YY,X_pin,Y_pin)
@@ -188,7 +209,7 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
     plt.text(X_0,Y_0+Nrow/2-Cheight*10, 'Bearing Dia=%s[mm]'%(bearing_dia),
         verticalalignment='center', horizontalalignment='center', color='blue', fontsize="large")
 
-    SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,khE,khR,R1,R2,X_e)
+    SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,khE,khR,R1,R2,bearing_dia,input_dia,X_e,X_pin,Y_pin,pin_hole_dia,pin_dia,angle_pins,pins)
 
     plt.show()
 
