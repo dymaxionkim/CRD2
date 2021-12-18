@@ -38,7 +38,7 @@ def Circle(DIA,SEG_CIRCLE):
     YY = DIA/2*np.cos(THETA0)
     return XX,YY
 
-    ## Color
+    ## Colors
     # 0 : white
     # 1 : red
     # 2 : yellow
@@ -47,9 +47,8 @@ def Circle(DIA,SEG_CIRCLE):
     # 5 : blue
     # 6 : violet
     # 7 : white
-    # 8 : gray
-    # 9 : white
-def SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,khE,khR,R1,R2,bearing_dia,input_dia,X_e,X_pin,Y_pin,pin_hole_dia,pin_dia,angle_pins,pins):
+    # 8 : grey
+def SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,Z1,Z2,rhE,rhR,khE,khR,R1,R2,bearing_dia,input_dia,X_e,X_pin,Y_pin,pin_hole_dia,pin_dia,angle_pins,pins):
     doc = ezdxf.new('R2000')
     msp = doc.modelspace()
     # Tooth of Eccentric Disc
@@ -80,24 +79,61 @@ def SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,khE,khR,R1,R2,bearing_dia,in
     # Bearing Circles
     msp.add_circle((X_0+X_e,Y_0),radius=bearing_dia/2,dxfattribs={'color':4})
     msp.add_circle((X_0,Y_0),radius=input_dia/2)
-    # Pins
+    # Pin holes
     X_pinhole_cen1 = X_0+X_pin+X_e
     Y_pinhole_cen1 = Y_0+Y_pin
     X_pinhole_cen2,Y_pinhole_cen2 = Transform(X_pinhole_cen1,Y_pinhole_cen1,-X_0-X_e,-Y_0)
     for i in range(0,pins):
-        msp.add_circle((X_0+X_pin,Y_0+Y_pin),radius=pin_dia/2,dxfattribs={'color':5})
         X_pinhole_cen3,Y_pinhole_cen3 = Rotation(X_pinhole_cen2,Y_pinhole_cen2,angle_pins,i)
         X_pinhole_cen4,Y_pinhole_cen4 = Transform(X_pinhole_cen3,Y_pinhole_cen3,X_0+X_e,Y_0)
         msp.add_circle((X_pinhole_cen4,Y_pinhole_cen4),radius=pin_hole_dia/2,dxfattribs={'color':4})
+    # Pins
+    X_pin_cen1 = X_0+X_pin
+    Y_pin_cen1 = Y_0+Y_pin
+    X_pin_cen2,Y_pin_cen2 = Transform(X_pin_cen1,Y_pin_cen1,-X_0,-Y_0)
+    for i in range(0,pins):
+        X_pin_cen3,Y_pin_cen3 = Rotation(X_pin_cen2,Y_pin_cen2,angle_pins,i)
+        X_pin_cen4,Y_pin_cen4 = Transform(X_pin_cen3,Y_pin_cen3,X_0,Y_0)
+        msp.add_circle((X_pin_cen4,Y_pin_cen4),radius=pin_dia/2,dxfattribs={'color':6})
+    # Deco for Ring Gear
+    X_START_RING = R1+8*rhR+X_0
+    Y_START_RING = Y_0
+    X_END_RING = R1+X_0
+    Y_END_RING = Y_0
+    msp.add_line([X_START_RING,Y_START_RING],[X_END_RING,Y_END_RING])
+    X_START_RING2,Y_START_RING2 = Transform(X_START_RING,Y_START_RING,-X_0,-Y_0)
+    X_START_RING3,Y_START_RING3 = Rotation(X_START_RING2,Y_START_RING2,2*np.pi/Z1,1)
+    X_START_RING4,Y_START_RING4 = Transform(X_START_RING3,Y_START_RING3,X_0,Y_0)
+    X_END_RING2,Y_END_RING2 = Transform(X_END_RING,Y_END_RING,-X_0,-Y_0)
+    X_END_RING3,Y_END_RING3 = Rotation(X_END_RING2,Y_END_RING2,2*np.pi/Z1,1)
+    X_END_RING4,Y_END_RING4 = Transform(X_END_RING3,Y_END_RING3,X_0,Y_0)
+    msp.add_line([X_START_RING4,Y_START_RING4],[X_END_RING4,Y_END_RING4])
+    msp.add_arc(center=(X_0,Y_0), radius=R1+8*rhR, start_angle=0, end_angle=360/Z1)
+    # Deco for Eccentric Disc
+    X_START_DISC = R2-8*rhE+X_0+X_e
+    Y_START_DISC = Y_0
+    X_END_DISC = R2+X_0+X_e
+    Y_END_DISC = Y_0
+    msp.add_line([X_START_DISC,Y_START_DISC],[X_END_DISC,Y_END_DISC],dxfattribs={'color':4})
+    X_START_DISC2,Y_START_DISC2 = Transform(X_START_DISC,Y_START_DISC,-X_0-X_e,-Y_0)
+    X_START_DISC3,Y_START_DISC3 = Rotation(X_START_DISC2,Y_START_DISC2,2*np.pi/Z2,1)
+    X_START_DISC4,Y_START_DISC4 = Transform(X_START_DISC3,Y_START_DISC3,X_0+X_e,Y_0)
+    X_END_DISC2,Y_END_DISC2 = Transform(X_END_DISC,Y_END_DISC,-X_0-X_e,-Y_0)
+    X_END_DISC3,Y_END_DISC3 = Rotation(X_END_DISC2,Y_END_DISC2,2*np.pi/Z2,1)
+    X_END_DISC4,Y_END_DISC4 = Transform(X_END_DISC3,Y_END_DISC3,X_0+X_e,Y_0)
+    msp.add_line([X_START_DISC4,Y_START_DISC4],[X_END_DISC4,Y_END_DISC4],dxfattribs={'color':4})
+    msp.add_arc(center=(X_0+X_e,Y_0), radius=R2-8*rhE, start_angle=0, end_angle=360/Z2 ,dxfattribs={'color':4})
     # Output
-    doc.saveas('Result.dxf')
+    Result = os.path.join(WorkingDirectory, f'Result.dxf')
+    doc.saveas(Result)
 
 def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
+    # Setup figure
     fig = plt.figure(figsize=(13,13))
     plt.axes().set_aspect('equal')
     plt.title('Cycloidal Eccentric Reducer Designer 2')
     plt.grid(True)
-
+    # Parameters
     R1 = Z1*M/2
     Resolution1 = 20
     Z2 = Z1-Ze
@@ -110,8 +146,6 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
     pin_dia = pin_hole_dia-2*X_e
     angle_pins = 2*np.pi/pins
     I=Z2-Z1/Z2
-
-    ###################
     # Eccentric Disc
     XhE,YhE,rhE,khE = Hypocycloid(R2,Z2,Resolution2)
     for i in range(0,int(2*Z2)):
@@ -119,15 +153,12 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
             Xh1,Yh1 = Rotation(XhE,YhE,2*np.pi/khE,i)
             Xh2,Yh2 = Transform(Xh1,Yh1,X_0+X_e,Y_0)
             plt.plot(Xh2,Yh2,'-',linewidth=1.5,color='blue',label='_nolegend_')
-
     XeE,YeE,reE,keE = Epycycloid(R2,Z2,Resolution1)
     for i in range(0,int(2*Z2)):
         if(i%2==0): # Case in Even Number
             Xe1,Ye1 = Rotation(XeE,YeE,2*np.pi/keE,i)
             Xe2,Ye2 = Transform(Xe1,Ye1,X_0+X_e,Y_0)
             plt.plot(Xe2,Ye2,'-',linewidth=1.5,color='blue',label='_nolegend_')
-
-    ###################
     # Ring Gear
     XhR,YhR,rhR,khR = Hypocycloid(R1,Z1,Resolution1)
     for i in range(0,int(2*Z1)):
@@ -135,35 +166,29 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
             Xh1,Yh1 = Rotation(XhR,YhR,2*np.pi/khR,i)
             Xh2,Yh2 = Transform(Xh1,Yh1,X_0,Y_0)
             plt.plot(Xh2,Yh2,'-',linewidth=1.5,color='black',label='_nolegend_')
-
     XeR,YeR,reR,keR = Epycycloid(R1,Z1,Resolution2)
     for i in range(0,int(2*Z1)):
         if(i%2==0): # Case in Even Number
             Xe1,Ye1 = Rotation(XeR,YeR,2*np.pi/keR,i)
             Xe2,Ye2 = Transform(Xe1,Ye1,X_0,Y_0)
             plt.plot(Xe2,Ye2,'-',linewidth=1.5,color='black',label='_nolegend_')
-
     # Pitch Cicle of Ring Gear
     XX,YY = Circle(2*R1,seg_circle)
     XX,YY = Transform(XX,YY,X_0,Y_0)
     plt.plot(XX,YY, ':', linewidth=1.0, color='red')
-
     # Pitch Cicle of Eccentric Disc
     XX,YY = Circle(2*R2,seg_circle)
     XX,YY = Transform(XX,YY,X_0+X_e,Y_0)
     plt.plot(XX,YY, ':', linewidth=1.0, color='red')
-
     # Bearing on Eccentric Disc
     XX,YY = Circle(bearing_dia,seg_circle)
     XX,YY = Transform(XX,YY,X_0+X_e,Y_0)
     plt.plot(XX,YY, '-', linewidth=1.5, color='blue')
-
     # Input Shaft
     input_dia = bearing_dia-2*X_e
     XX,YY = Circle(input_dia,seg_circle)
     XX,YY = Transform(XX,YY,X_0,Y_0)
     plt.plot(XX,YY, '-', linewidth=1.5, color='black')
-
     # Pin holes on Eccentric Disc
     X_pin = (R2+bearing_dia/2)/2
     Y_pin = 0.0
@@ -173,7 +198,6 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
         XX2,YY2 = Rotation(XX,YY,angle_pins,i)
         XX2,YY2 = Transform(XX2,YY2,X_0+X_e,Y_0)
         plt.plot(XX2,YY2, '-', linewidth=1.5, color='blue')
-
     # Pin on Output Shaft
     for i in range(0,pins):
         XX,YY = Circle(pin_dia,seg_circle)
@@ -181,7 +205,6 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
         XX2,YY2 = Rotation(XX,YY,angle_pins,i)
         XX2,YY2 = Transform(XX2,YY2,X_0,Y_0)
         plt.plot(XX2,YY2, '-', linewidth=1.5, color='orange')
-        
     # Annotate
     Cheight = 2*R1/40
     Nrow = 11*Cheight
@@ -197,10 +220,9 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
         verticalalignment='center', horizontalalignment='center', color='black', fontsize="large")
     plt.text(X_0,Y_0+Nrow/2-Cheight*5, 'Tooth Circle Dia2=%s[mm]'%(2*R2/(2*Z2)),
         verticalalignment='center', horizontalalignment='center', color='blue', fontsize="large")
-        
     plt.text(X_0,Y_0+Nrow/2-Cheight*6, 'Reduction Ratio=%s'%(I),
         verticalalignment='center', horizontalalignment='center', color='red', fontsize="large")
-    plt.text(X_0,Y_0+Nrow/2-Cheight*7, 'Eccentric Distance=%s[mm]'%(2*X_e),
+    plt.text(X_0,Y_0+Nrow/2-Cheight*7, 'Eccentric Distance=%s[mm]'%(X_e),
         verticalalignment='center', horizontalalignment='center', color='green', fontsize="large")
     plt.text(X_0,Y_0+Nrow/2-Cheight*8, 'Pin Dia=%s[mm]'%(pin_dia),
         verticalalignment='center', horizontalalignment='center', color='orange', fontsize="large")
@@ -208,17 +230,19 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
         verticalalignment='center', horizontalalignment='center', color='blue', fontsize="large")
     plt.text(X_0,Y_0+Nrow/2-Cheight*10, 'Bearing Dia=%s[mm]'%(bearing_dia),
         verticalalignment='center', horizontalalignment='center', color='blue', fontsize="large")
-
-    SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,khE,khR,R1,R2,bearing_dia,input_dia,X_e,X_pin,Y_pin,pin_hole_dia,pin_dia,angle_pins,pins)
-
+    # dxf
+    SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,Z1,Z2,rhE,rhR,khE,khR,R1,R2,bearing_dia,input_dia,X_e,X_pin,Y_pin,pin_hole_dia,pin_dia,angle_pins,pins)
+    # Figure
+    Result = os.path.join(WorkingDirectory, f'Result.png')
+    plt.savefig(Result,dpi=100)
     plt.show()
-
 
 ##############################
 # GUI
 sg.theme('Default')
-col = [[sg.Text('Module, M =',size = (32,1)),sg.Input(0.747865,key='-M-',size = (10,1)),sg.Text('[mm], (>0)')],
-       [sg.Text('Teeth Number of Ring, Z1 =',size = (32,1)),sg.Input(80,key='-Z1-',size = (10,1)),sg.Text('[ea], (>30)')],
+col = [[sg.Text('Working Directory :',size=(15,1)), sg.Input('./Result/',key='-WorkingDirectoty-',size=(16,1)), sg.FolderBrowse()],
+        [sg.Text('Module, M =',size = (32,1)),sg.Input(1.0,key='-M-',size = (10,1)),sg.Text('[mm], (>0)')],
+       [sg.Text('Teeth Number of Ring, Z1 =',size = (32,1)),sg.Input(83,key='-Z1-',size = (10,1)),sg.Text('[ea], (>30)')],
        [sg.Text('Diff. of Ring and Disc, Ze =',size = (32,1)),sg.Input(2,key='-Ze-',size = (10,1)),sg.Text('[ea]')],
        [sg.Text('Number of Pins, pins =',size = (32,1)),sg.Input(16,key='-pins-',size = (10,1)),sg.Text('[ea]')],
        [sg.Text('Center Position, X_0 =',size = (32,1)),sg.Input(0.0,key='-X_0-',size = (10,1)),sg.Text('[mm]')],
@@ -234,6 +258,7 @@ while True:
     event, values = window.read()
 
     try:
+        WorkingDirectory = values['-WorkingDirectoty-']
         M = float(values['-M-'])
         Z1 = int(values['-Z1-'])
         Ze = int(values['-Ze-'])
@@ -248,8 +273,7 @@ while True:
     if event in (sg.WIN_CLOSED, 'Exit'):
         break
     elif event == 'Run':
+        os.makedirs(WorkingDirectory, exist_ok=True)
         CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR)
 
 window.close()
-
-
