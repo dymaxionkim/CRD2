@@ -50,9 +50,4 @@ python CRD2.py
 * __X0,Y0__ : Center position
 
 
-## To do
-
-* dxf output
-
-
 ## Thank you!
