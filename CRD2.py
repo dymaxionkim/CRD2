@@ -145,7 +145,7 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
     pin_hole_dia = (R2-bearing_dia/2)*PIN_HOLE_FACTOR
     pin_dia = pin_hole_dia-2*X_e
     angle_pins = 2*np.pi/pins
-    I=Z2-Z1/Z2
+    I=Z2/(Z2-Z1)
     # Eccentric Disc
     XhE,YhE,rhE,khE = Hypocycloid(R2,Z2,Resolution2)
     for i in range(0,int(2*Z2)):
@@ -242,7 +242,7 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
 sg.theme('Default')
 col = [[sg.Text('Working Directory :',size=(15,1)), sg.Input('./Result/',key='-WorkingDirectoty-',size=(16,1)), sg.FolderBrowse()],
         [sg.Text('Module, M =',size = (32,1)),sg.Input(1.0,key='-M-',size = (10,1)),sg.Text('[mm], (>0)')],
-       [sg.Text('Teeth Number of Ring, Z1 =',size = (32,1)),sg.Input(83,key='-Z1-',size = (10,1)),sg.Text('[ea], (>30)')],
+       [sg.Text('Teeth Number of Ring, Z1 =',size = (32,1)),sg.Input(82,key='-Z1-',size = (10,1)),sg.Text('[ea], (Even Number)')],
        [sg.Text('Diff. of Ring and Disc, Ze =',size = (32,1)),sg.Input(2,key='-Ze-',size = (10,1)),sg.Text('[ea]')],
        [sg.Text('Number of Pins, pins =',size = (32,1)),sg.Input(16,key='-pins-',size = (10,1)),sg.Text('[ea]')],
        [sg.Text('Center Position, X_0 =',size = (32,1)),sg.Input(0.0,key='-X_0-',size = (10,1)),sg.Text('[mm]')],
