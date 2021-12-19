@@ -1,2 +1,7 @@
 ﻿Result.dxf
 Result/
+CRD2.spec
+build/
+dist/
+__pycache__
+CRD2.zip

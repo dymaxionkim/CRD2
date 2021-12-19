@@ -21,6 +21,14 @@ pip install pysimplegui
 python CRD2.py
 ```
 
+## Build exe in MS Windows 10
+
+* Development version of pyinstaller is needed because of matplotlib matching issue.
+
+```
+pip install https://github.com/pyinstaller/pyinstaller/archive/develop.zip
+pyinstaller --icon=CRD2.ico -w -F CRD2.py
+```
 
 ## Using on Android Device by Pydroid3
 

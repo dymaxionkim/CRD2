@@ -252,7 +252,7 @@ col = [[sg.Text('Working Directory :',size=(15,1)), sg.Input('./Result/',key='-W
        [sg.Button('Run'), sg.Button('Exit')]]
 
 layout = [[col]]
-window = sg.Window('CRD2',layout)
+window = sg.Window('CRD2',layout,icon="CRD2.ico")
 
 while True:
     event, values = window.read()
