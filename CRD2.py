@@ -74,8 +74,8 @@ def SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,Z1,Z2,rhE,rhR,khE,khR,R1,R2,
     msp.add_spline(cpoint1R)
     msp.add_spline(cpoint2R)
     # Pitch Circles
-    msp.add_circle((X_0+X_e,Y_0),radius=R2,dxfattribs={'color':4,'linetype':'DASHED'})
-    msp.add_circle((X_0,Y_0),radius=R1,dxfattribs={'color':0,'linetype':'DASHED'})
+    msp.add_circle((X_0+X_e,Y_0),radius=R2,dxfattribs={'color':4})
+    msp.add_circle((X_0,Y_0),radius=R1,dxfattribs={'color':0})
     # Bearing Circles
     msp.add_circle((X_0+X_e,Y_0),radius=bearing_dia/2,dxfattribs={'color':4})
     msp.add_circle((X_0,Y_0),radius=input_dia/2)
@@ -241,14 +241,14 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
 # GUI
 sg.theme('Default')
 col = [[sg.Text('Working Directory :',size=(15,1)), sg.Input('./Result/',key='-WorkingDirectoty-',size=(16,1)), sg.FolderBrowse()],
-        [sg.Text('Module, M =',size = (32,1)),sg.Input(1.0,key='-M-',size = (10,1)),sg.Text('[mm], (>0)')],
-       [sg.Text('Teeth Number of Ring, Z1 =',size = (32,1)),sg.Input(82,key='-Z1-',size = (10,1)),sg.Text('[ea], (Even Number)')],
+        [sg.Text('Pitch Dia, D1 =',size = (32,1)),sg.Input(38.0,key='-D1-',size = (10,1)),sg.Text('[mm]')],
+       [sg.Text('Teeth Number of Ring, Z1 =',size = (32,1)),sg.Input(38,key='-Z1-',size = (10,1)),sg.Text('[ea], (Even Number)')],
        [sg.Text('Diff. of Ring and Disc, Ze =',size = (32,1)),sg.Input(2,key='-Ze-',size = (10,1)),sg.Text('[ea]')],
        [sg.Text('Number of Pins, pins =',size = (32,1)),sg.Input(16,key='-pins-',size = (10,1)),sg.Text('[ea]')],
        [sg.Text('Center Position, X_0 =',size = (32,1)),sg.Input(0.0,key='-X_0-',size = (10,1)),sg.Text('[mm]')],
        [sg.Text('Center Position, Y_0 =',size = (32,1)),sg.Input(0.0,key='-Y_0-',size = (10,1)),sg.Text('[mm]')],
-       [sg.Text('Bearing Size Factor =',size = (32,1)),sg.Input(0.6,key='-BEARING_FACTOR-',size = (10,1)),sg.Text('(0~1)')],
-       [sg.Text('Pin Hole Size Factor =',size = (32,1)),sg.Input(0.6,key='-PIN_HOLE_FACTOR-',size = (10,1)),sg.Text('(0~1)')],
+       [sg.Text('Bearing Size =',size = (32,1)),sg.Input(21.0,key='-BEARING_SIZE-',size = (10,1)),sg.Text('[mm]')],
+       [sg.Text('Pin Size =',size = (32,1)),sg.Input(2.0,key='-PIN_SIZE-',size = (10,1)),sg.Text('[mm]')],
        [sg.Button('Run'), sg.Button('Exit')]]
 
 layout = [[col]]
@@ -259,14 +259,17 @@ while True:
 
     try:
         WorkingDirectory = values['-WorkingDirectoty-']
-        M = float(values['-M-'])
+        D1 = float(values['-D1-'])
         Z1 = int(values['-Z1-'])
+        M = D1/Z1
         Ze = int(values['-Ze-'])
         pins = int(values['-pins-'])
         X_0 = float(values['-X_0-'])
         Y_0 = float(values['-Y_0-'])
-        BEARING_FACTOR = float(values['-BEARING_FACTOR-'])
-        PIN_HOLE_FACTOR = float(values['-PIN_HOLE_FACTOR-'])
+        BEARING_SIZE = float(values['-BEARING_SIZE-'])
+        BEARING_FACTOR = BEARING_SIZE/(M*(Z1-Ze))
+        PIN_SIZE = float(values['-PIN_SIZE-'])
+        PIN_HOLE_FACTOR = (PIN_SIZE+Ze*M) / ((Z1-Ze)*M/2-BEARING_SIZE/2)
     except:
         sg.popup('Type error.')
 
