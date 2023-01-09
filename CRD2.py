@@ -127,7 +127,7 @@ def SaveDXF(XhE,YhE,XeE,YeE,XhR,YhR,XeR,YeR,X_0,Y_0,Z1,Z2,rhE,rhR,khE,khR,R1,R2,
     Result = os.path.join(WorkingDirectory, f'Result.dxf')
     doc.saveas(Result)
 
-def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
+def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR,X_pin):
     # Setup figure
     fig = plt.figure(figsize=(13,13))
     plt.axes().set_aspect('equal')
@@ -190,7 +190,7 @@ def CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR):
     XX,YY = Transform(XX,YY,X_0,Y_0)
     plt.plot(XX,YY, '-', linewidth=1.5, color='black')
     # Pin holes on Eccentric Disc
-    X_pin = (R2+bearing_dia/2)/2
+    #X_pin = (R2+bearing_dia/2)/2
     Y_pin = 0.0
     for i in range(0,pins):
         XX,YY = Circle(pin_hole_dia,seg_circle)
@@ -245,6 +245,7 @@ col = [[sg.Text('Working Directory :',size=(15,1)), sg.Input('./Result/',key='-W
        [sg.Text('Teeth Number of Ring, Z1 =',size = (32,1)),sg.Input(38,key='-Z1-',size = (10,1)),sg.Text('[ea], (Even Number)')],
        [sg.Text('Diff. of Ring and Disc, Ze =',size = (32,1)),sg.Input(2,key='-Ze-',size = (10,1)),sg.Text('[ea]')],
        [sg.Text('Number of Pins, pins =',size = (32,1)),sg.Input(16,key='-pins-',size = (10,1)),sg.Text('[ea]')],
+       [sg.Text('Pin X Position =',size = (32,1)),sg.Input(2.0,key='-PIN_XPOS-',size = (10,1)),sg.Text('[mm]')],
        [sg.Text('Center Position, X_0 =',size = (32,1)),sg.Input(0.0,key='-X_0-',size = (10,1)),sg.Text('[mm]')],
        [sg.Text('Center Position, Y_0 =',size = (32,1)),sg.Input(0.0,key='-Y_0-',size = (10,1)),sg.Text('[mm]')],
        [sg.Text('Bearing Size =',size = (32,1)),sg.Input(21.0,key='-BEARING_SIZE-',size = (10,1)),sg.Text('[mm]')],
@@ -264,6 +265,7 @@ while True:
         M = D1/Z1
         Ze = int(values['-Ze-'])
         pins = int(values['-pins-'])
+        X_pin = float(values['-PIN_XPOS-'])
         X_0 = float(values['-X_0-'])
         Y_0 = float(values['-Y_0-'])
         BEARING_SIZE = float(values['-BEARING_SIZE-'])
@@ -277,6 +279,6 @@ while True:
         break
     elif event == 'Run':
         os.makedirs(WorkingDirectory, exist_ok=True)
-        CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR)
+        CRD2_PLOT(M,Z1,Ze,pins,X_0,Y_0,BEARING_FACTOR,PIN_HOLE_FACTOR,X_pin)
 
 window.close()
