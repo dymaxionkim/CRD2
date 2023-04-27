@@ -52,6 +52,25 @@ pyinstaller --icon=CRD2.ico -w -F CRD2.py
 
 ![](./img/dxf.jpg)
 
+
+## Using on Linux
+
+* **Anaconda3** has Tk font problem.
+* In **pyenv** Environment
+
+```bash
+pyenv install 3.11.3
+pyenv global 3.11.3
+
+pip install numpy
+pip install matplotlib
+pip install ezdxf
+pip install pysimplegui
+
+python CRD2.py
+```
+
+
 ## Input parameters
 
 * __M__ : Module (Similar to Involute gear design system)
