@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import ezdxf
 
+sg.set_options(font=('D2Coding', 12))
+
 ##############################
 # Function
 def Rotation(Xtemp,Ytemp,ANGLE,i):
