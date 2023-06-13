@@ -1,12 +1,12 @@
-REM Anaconda3 Environment
+REM Miniconda3 Environment in scoop
 REM set root=%USERPROFILE%\anaconda3
-set root=%LOCALAPPDATA%\miniconda3
-call %root%\Scripts\activate.bat %root%
+set root=%userprofile%\scoop\apps\miniconda3\current
+call %root%\Scripts\activate.bat
 REM call conda env list
-call conda activate base
+REM call conda activate base
 
 REM Start App
-call cd /d D:\git\CRD2\
+call cd /d D:\github\CRD2\
 call python CRD2.py
 
 REM pause

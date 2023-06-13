@@ -9,10 +9,10 @@ _Cycloidal Eccentric Reducer Designer 2 - with Python3_
 * Install some libraries :
 
 ```
-pip install numpy
-pip install matplotlib
-pip install ezdxf
-pip install pysimplegui
+conda install numpy
+conda install matplotlib
+conda install ezdxf
+conda install pysimplegui
 ```
 * Clone this repository by git
 * Run :
